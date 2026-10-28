@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090909">
+<title>QuizMania — Reta tu mente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Sustitutos de la guía: Inter (Whyte Inktrap), JetBrains Mono (Whyte Inktrap Mono), Lora Italic (GrandSlang) -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=JetBrains+Mono:wght@400&family=Lora:ital,wght@1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#090909;          /* lienzo */
+  --paper:#f7f9fa;         /* texto principal, trazos */
+  --soft:#f0f0f0;          /* etiquetas estampadas */
+  --steel:#828384;         /* texto secundario */
+  --graphite:#474747;      /* divisores sutiles */
+  --iron:#423738;
+  --ash:#6b6b6b;           /* bordes de nav */
+  --violet:#af50ff;        /* la única voz cromática */
+  --lavender:#e1bdff;
+  --wash:rgba(237,195,196,.05);
+  --hair:rgba(247,249,250,.16);
+  --hair-strong:rgba(247,249,250,.45);
+  --sans:"Whyte Inktrap","Inter","General Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --mono:"Whyte Inktrap Mono","JetBrains Mono","IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --serif:"GrandSlang","Lora","Tiempos Headline",Georgia,serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:var(--void);color:var(--paper);font-family:var(--sans);font-weight:400;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--paper);outline-offset:3px}
+h1,h2,h3,p{margin-top:0}
+.hidden{display:none!important}
+.wrap{width:min(1200px,100%);margin:0 auto;padding:0 24px}
+
+/* ---------- Nav translúcida ---------- */
+.nav{position:fixed;top:0;left:0;right:0;z-index:30;background:rgba(51,50,72,.7);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--ash)}
+.nav-in{width:min(1200px,100%);margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{font-weight:500;font-size:20px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px;text-decoration:none}
+.brand i{font-style:normal;font-weight:300}
+.nav-links{display:flex;gap:28px}
+.nav-links a{font-size:12px;text-transform:uppercase;letter-spacing:.07em;text-decoration:none;padding:10px 0;color:var(--paper);opacity:.8}
+.nav-links a:hover{opacity:1;text-decoration:underline;text-underline-offset:4px}
+.tools{display:flex;align-items:center;gap:10px}
+.cloud{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel);white-space:nowrap}
+
+/* ---------- Botones ---------- */
+.btn-filled{background:var(--void);border:1px solid var(--paper);border-radius:8px;padding:12px 18px;color:var(--paper);font-weight:400;transition:background .2s}
+.btn-filled:hover{background:rgba(247,249,250,.1)}
+.btn-compact{background:rgba(247,249,250,.08);border:1px solid var(--paper);border-radius:6px;padding:9px 15px;font-size:14px;color:var(--paper)}
+.btn-compact:hover{background:rgba(247,249,250,.16)}
+.btn-violet{background:var(--violet);border:0;border-radius:8px;padding:16px 28px;color:var(--void);font-weight:500;transition:filter .2s}
+.btn-violet:hover{filter:brightness(1.12)}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;background:var(--wash);border:0;border-radius:1584px;padding:18px 28px;color:var(--paper);text-decoration:none;transition:background .2s}
+.btn-ghost:hover{background:rgba(237,195,196,.12)}
+
+/* ---------- Etiquetas estampadas ---------- */
+.stamp{font-family:var(--mono);font-weight:400;text-transform:uppercase;letter-spacing:.2em;color:var(--soft);line-height:.95;margin:0;overflow-wrap:anywhere}
+.stamp-xl{font-size:clamp(14px,5.6vw,74px)}
+.stamp-sm{font-size:clamp(13px,2.6vw,26px)}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--steel)}
+
+/* ---------- Hero: cielo del atardecer ---------- */
+.hero{position:relative;overflow:hidden;min-height:min(100vh,860px);padding:150px 0 100px;display:flex;align-items:center;
+  background:
+   radial-gradient(55% 40% at 78% 88%,rgba(255,170,200,.38),transparent 70%),
+   radial-gradient(45% 38% at 15% 28%,rgba(175,80,255,.40),transparent 70%),
+   radial-gradient(60% 42% at 88% 22%,rgba(225,189,255,.22),transparent 72%),
+   radial-gradient(40% 25% at 45% 55%,rgba(225,189,255,.12),transparent 72%),
+   linear-gradient(180deg,#0b0714 0%,#1a1033 52%,#35205a 78%,var(--void) 100%)}
+.hero:after{content:"";position:absolute;left:0;right:0;bottom:0;height:160px;background:linear-gradient(180deg,transparent,var(--void));pointer-events:none}
+.plane{position:absolute;top:20%;left:-10%;width:140px;height:2px;background:linear-gradient(90deg,transparent,rgba(247,249,250,.9));animation:fly 22s linear infinite;pointer-events:none}
+.plane:after{content:"";position:absolute;right:-6px;top:-5px;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle,#fff 0,rgba(255,255,255,.4) 35%,transparent 70%)}
+@keyframes fly{from{transform:translate(0,0)}to{transform:translate(130vw,-90px)}}
+.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.2fr .8fr;gap:56px;align-items:center}
+.hero h1{margin:18px 0 28px;font-weight:400}
+.hero h1 .l1,.hero h1 .l3{display:block;font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.03em;line-height:.9}
+.hero h1 .l1{font-size:clamp(64px,12vw,146px)}
+.hero h1 .l2{display:block;font-size:clamp(38px,6vw,64px);font-weight:400;letter-spacing:-.04em;line-height:1.1;margin:6px 0}
+.hero h1 .l3{font-size:clamp(44px,7vw,88px)}
+.subhead{font-size:20px;font-weight:300;color:rgba(247,249,250,.78);max-width:520px;margin:0}
+
+/* Pase de abordaje */
+.pass{display:flex;gap:28px;border:1px solid var(--hair-strong);border-radius:19.2px;background:var(--wash);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:32px}
+.pass-main{flex:1;min-width:0}
+.route{display:flex;align-items:center;gap:14px;font-size:28px;font-weight:300;letter-spacing:-.02em;margin:14px 0 22px;flex-wrap:wrap}
+.route i{font-style:normal;color:var(--steel)}
+.pass-stats{margin:0 0 26px}
+.pass-stats div{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:12px 0;border-top:1px solid var(--hair)}
+.pass-stats dt{font-size:14px;color:var(--steel)}
+.pass-stats dd{margin:0;font-size:28px;font-weight:300;letter-spacing:-.02em}
+.pass-actions{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.barcode{width:54px;flex:none;opacity:.85;background:repeating-linear-gradient(180deg,var(--paper) 0 3px,transparent 3px 6px,var(--paper) 6px 7px,transparent 7px 11px,var(--paper) 11px 15px,transparent 15px 17px,var(--paper) 17px 18px,transparent 18px 22px)}
+
+/* ---------- Secciones ---------- */
+.section{padding-top:120px}
+.section-head{margin-bottom:36px}
+.section-head p{margin:14px 0 0;color:var(--steel);font-size:16px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.category{position:relative;overflow:hidden;text-align:left;min-height:190px;padding:28px;border:1px solid var(--hair);border-radius:19.2px;background:transparent;display:flex;flex-direction:column;justify-content:flex-end;transition:background .25s,border-color .25s}
+.category .num{position:absolute;left:24px;top:8px;font-size:88px;font-weight:300;letter-spacing:-.04em;line-height:1;color:rgba(247,249,250,.08)}
+.category .arrow{position:absolute;right:24px;top:22px;color:var(--steel);font-size:18px}
+.category strong{display:block;font-size:20px;font-weight:500;letter-spacing:-.01em;margin-bottom:6px;position:relative}
+.category small{color:var(--steel);font-size:14px;line-height:1.5;position:relative}
+.category:hover{border-color:var(--hair-strong);background:var(--wash)}
+/* Violet Bloom: la única tarjeta con color */
+.category.selected{border-color:rgba(247,249,250,.6);background:radial-gradient(120% 110% at 0% 0%,var(--violet) 0%,#a99db6 55%,#4c1997 100%)}
+.category.selected small,.category.selected .arrow{color:rgba(247,249,250,.85)}
+.category.selected .num{color:rgba(247,249,250,.18)}
+.controls{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:32px}
+.controls label{font-size:14px;color:var(--steel)}
+select,input{background:transparent;border:1px solid var(--hair-strong);border-radius:8px;padding:14px 16px;max-width:100%}
+select{min-width:210px}
+select option{background:#151515;color:var(--paper)}
+input::placeholder{color:var(--steel)}
+.note{font-size:14px;color:var(--steel);line-height:1.6;margin:20px 0 0;max-width:640px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:56px}
+.record-list{display:grid}
+.record{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0;border-top:1px solid var(--hair)}
+.record:last-child{border-bottom:1px solid var(--hair)}
+.record b{font-weight:500}
+.record small{display:block;color:var(--steel);margin-top:2px;font-size:14px}
+.record strong{font-family:var(--mono);font-weight:400;letter-spacing:.08em;font-size:14px}
+.empty{color:var(--steel);font-size:14px;line-height:1.6;margin:0;padding:16px 0;border-top:1px solid var(--hair)}
+
+/* ---------- Juego ---------- */
+#game,#results{margin-top:112px;padding-bottom:20px}
+.game-top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:22px}
+.tag{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:9px 16px;border:1px solid var(--hair-strong);border-radius:1584px;color:var(--paper);background:transparent}
+.tag.quiet{border-color:var(--hair);color:var(--steel)}
+.timer{font-family:var(--mono);font-size:22px;letter-spacing:.1em;font-variant-numeric:tabular-nums}
+.timer.low{animation:blink 1s steps(2,jump-none) infinite;text-decoration:underline;text-underline-offset:6px}
+@keyframes blink{50%{opacity:.35}}
+.progress{height:3px;background:rgba(247,249,250,.14);margin-bottom:32px;overflow:hidden}
+.progress div{height:100%;width:0;background:var(--violet);transition:width .3s}
+.question{font-size:clamp(28px,5vw,48px);font-weight:300;line-height:1.15;letter-spacing:-.03em;margin:8px 0 36px;max-width:900px}
+.answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.answer{text-align:left;min-height:72px;display:flex;align-items:center;gap:16px;padding:16px 20px;border:1px solid var(--hair);border-radius:8px;background:var(--wash);line-height:1.35;transition:border-color .2s,background .2s;position:relative}
+.answer .letter{flex:none;font-family:var(--mono);font-size:13px;letter-spacing:.1em;color:var(--steel);width:28px}
+.answer:hover:not(:disabled){border-color:var(--hair-strong);background:rgba(237,195,196,.1)}
+.answer.correct{background:var(--paper);border-color:var(--paper);color:var(--void)}
+.answer.correct .letter{color:var(--void)}
+.answer.correct:after{content:"✓";position:absolute;right:18px;font-weight:700}
+.answer.wrong{border-style:dashed;border-color:var(--steel);color:var(--steel);text-decoration:line-through}
+.answer.wrong:after{content:"✕";position:absolute;right:18px;text-decoration:none}
+.answer:disabled{cursor:default}
+.feedback{min-height:28px;margin-top:26px;font-size:18px;font-weight:300;line-height:1.5}
+.feedback.ok{color:var(--paper)}
+.feedback.bad{color:var(--steel)}
+.game-bottom{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:24px;padding-top:24px;border-top:1px solid var(--hair)}
+.lives{letter-spacing:.35em;font-size:22px}
+.btn-next{background:var(--paper);color:var(--void);border:0;border-radius:8px;padding:16px 28px;font-weight:500}
+.btn-next:hover{filter:brightness(.9)}
+
+/* ---------- Resultados ---------- */
+.result{max-width:900px}
+.result h2{font-size:clamp(32px,6vw,64px);font-weight:400;letter-spacing:-.04em;line-height:1.05;margin:20px 0 6px}
+.result-score{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.03em;line-height:.9;font-size:clamp(88px,18vw,146px);margin:10px 0 16px}
+.result p{color:rgba(247,249,250,.75);font-size:18px;font-weight:300;max-width:600px}
+.result-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+.status{font-size:14px;color:var(--steel);line-height:1.6;margin-top:22px}
+
+/* ---------- Pie con sello ---------- */
+footer{margin-top:140px;padding:28px 24px 36px;border-top:1px solid var(--hair)}
+.foot{width:min(1200px,100%);margin:0 auto;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:14px}
+.foot span{display:inline-flex;gap:22px;align-items:center;flex-wrap:wrap}
+.foot .clock{font-variant-numeric:tabular-nums;color:var(--steel)}
+
+/* ---------- Modal y toast ---------- */
+.modal-backdrop{position:fixed;inset:0;background:rgba(9,9,9,.72);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:grid;place-items:center;padding:18px;z-index:40}
+.modal{width:min(460px,100%);background:#0e0e0f;border:1px solid var(--hair-strong);border-radius:19.2px;padding:36px}
+.modal h2{font-size:28px;font-weight:300;letter-spacing:-.03em;margin-bottom:10px}
+.modal p{color:var(--steel);font-size:14px;line-height:1.6}
+.form{display:grid;gap:12px;margin-top:22px}
+.form input{width:100%}
+.form-actions{display:flex;gap:10px;flex-wrap:wrap}
+.form-actions .btn-violet{padding:13px 22px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);padding:12px 18px;background:rgba(51,50,72,.85);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid var(--hair-strong);border-radius:8px;z-index:50;max-width:calc(100% - 28px);text-align:center;font-size:14px}
+.pop{animation:pop .35s ease}
+.shake{animation:shake .3s ease}
+@keyframes pop{0%{transform:scale(.97);opacity:.5}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* ---------- Responsive ---------- */
+@media(max-width:960px){
+  .hero-grid{grid-template-columns:1fr;gap:40px}
+  .nav-links{display:none}
+  .two-col{grid-template-columns:1fr;gap:72px}
+}
+@media(max-width:700px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cloud{display:none}
+  .section{padding-top:88px}
+  .hero{padding:120px 0 80px}
+  .pass{padding:24px}
+}
+@media(max-width:460px){
+  .wrap{padding:0 16px}
+  .nav-in{padding:10px 16px}
+  .grid{gap:10px}
+  .category{padding:18px;min-height:160px}
+  .category .num{font-size:64px;left:16px}
+  .answers{grid-template-columns:1fr}
+  .game-bottom{align-items:stretch}
+  .game-bottom .btn-next{width:100%}
+  .btn-compact{padding:9px 11px}
+  .btn-filled{padding:10px 12px;font-size:14px}
+  .subhead{font-size:18px}
+  .modal{padding:26px}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#" aria-label="QuizMania inicio">Quiz<i>Mania</i></a>
+    <nav class="nav-links" aria-label="Principal">
+      <a href="#categorias">Categorías</a>
+      <a href="#records">Récords</a>
+      <a href="#tabla">Tabla en línea</a>
+    </nav>
+    <div class="tools">
+      <span class="cloud" id="cloud-status">● Modo local</span>
+      <button class="btn-compact" id="sound-toggle" type="button" aria-pressed="true">● Sonido</button>
+      <button class="btn-filled" id="account-button" type="button">Iniciar sesión</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="home">
+    <div class="hero">
+      <div class="plane" aria-hidden="true"></div>
+      <div class="wrap hero-grid">
+        <div>
+          <p class="label" style="color:var(--soft)">Piensa rápido · Aprende jugando</p>
+          <h1>
+            <span class="l1">Tu nuevo</span>
+            <span class="l2">Reto Mental</span>
+            <span class="l3">con 3 vidas</span>
+          </h1>
+          <p class="subhead">Elige tu categoría, responde antes de que termine el tiempo y consigue una racha perfecta. ¿Podrás llegar a la cima?</p>
+        </div>
+        <aside class="pass" aria-label="Resumen de tu cuenta">
+          <div class="pass-main">
+            <p class="label" style="margin:0;color:var(--soft)">Pase de abordaje</p>
+            <p class="route"><span>Curioso</span><i>→</i><span>Maestro</span></p>
+            <dl class="pass-stats">
+              <div><dt>Tu récord local</dt><dd id="best-stat">0</dd></div>
+              <div><dt>Vidas por partida</dt><dd>03</dd></div>
+              <div><dt>Bonus de racha</dt><dd>+50%</dd></div>
+            </dl>
+            <div class="pass-actions">
+              <a class="btn-ghost" href="#categorias">Elegir categoría ↓</a>
+              <a class="btn-ghost" href="#records">Ver récords →</a>
+            </div>
+          </div>
+          <div class="barcode" aria-hidden="true"></div>
+        </aside>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="section" id="categorias">
+        <div class="section-head">
+          <h2 class="stamp stamp-xl">Elige una categoría</h2>
+          <p>Selecciona el tema que quieras dominar.</p>
+        </div>
+        <div class="grid" id="categories"></div>
+        <div class="controls">
+          <label for="difficulty">Dificultad</label>
+          <select id="difficulty" aria-label="Dificultad">
+            <option value="easy">Fácil · 20 segundos</option>
+            <option value="normal" selected>Normal · 15 segundos</option>
+            <option value="hard">Difícil · 10 segundos</option>
+          </select>
+          <button class="btn-violet" id="start-button" type="button">Comenzar partida →</button>
+        </div>
+        <p class="note">Puedes jugar sin registrarte. Tus récords locales se guardan en este navegador. Para sincronizarlos entre dispositivos, configura Supabase siguiendo las instrucciones al final.</p>
+      </div>
+
+      <div class="section two-col">
+        <section id="records">
+          <div class="section-head">
+            <h2 class="stamp stamp-sm">Tus récords</h2>
+            <p>Mejores resultados guardados en este dispositivo.</p>
+          </div>
+          <div class="record-list" id="local-records"></div>
+        </section>
+        <section id="tabla">
+          <div class="section-head">
+            <h2 class="stamp stamp-sm">Tabla en línea</h2>
+            <p>Récords de jugadores registrados.</p>
+          </div>
+          <div class="record-list" id="online-records"><p class="empty">La tabla en línea estará disponible cuando conectes Supabase.</p></div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <section id="game" class="hidden">
+      <div class="game-top">
+        <span class="tag" id="game-category">01 / Ciencia</span>
+        <span class="tag quiet">Racha <b id="streak">0</b></span>
+        <span class="timer" id="timer">15 s</span>
+      </div>
+      <div class="progress"><div id="game-progress"></div></div>
+      <div class="game-top">
+        <span class="label" id="question-count">Pregunta 1</span>
+        <span class="label" id="points">0 puntos</span>
+      </div>
+      <h2 class="question" id="question">Pregunta</h2>
+      <div class="answers" id="answers"></div>
+      <div class="feedback" id="feedback" aria-live="polite"></div>
+      <div class="game-bottom">
+        <div class="lives" id="lives" aria-label="Vidas restantes">♥♥♥</div>
+        <button class="btn-next hidden" id="next-button" type="button">Siguiente pregunta →</button>
+      </div>
+    </section>
+
+    <section id="results" class="hidden">
+      <div class="result">
+        <p class="label" id="result-emoji" style="color:var(--soft)">Resultado final</p>
+        <h2 id="result-title">¡Partida terminada!</h2>
+        <div class="result-score" id="result-score">0</div>
+        <p id="result-summary"></p>
+        <div class="result-actions">
+          <button class="btn-violet" id="again-button" type="button">Jugar otra vez ↻</button>
+          <button class="btn-filled" id="home-button" type="button">Inicio</button>
+        </div>
+        <p class="status" id="save-status"></p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="foot">
+    <span><b style="font-weight:400">+</b> <span>Quiz Mania</span> <span>Aprende jugando</span></span>
+    <span><span class="clock" id="clock"></span><span aria-hidden="true">♡</span></span>
+  </div>
+</footer>
+
+<div class="modal-backdrop hidden" id="account-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal">
+    <h2 id="modal-title">Tu cuenta QuizMania</h2>
+    <p id="account-intro">Puedes jugar sin cuenta. Para sincronizar tus récords entre dispositivos, configura primero Supabase en el código.</p>
+    <div class="form">
+      <input id="email" type="email" placeholder="Correo electrónico" autocomplete="email">
+      <input id="password" type="password" placeholder="Contraseña (mínimo 6 caracteres)" autocomplete="current-password">
+      <div class="form-actions">
+        <button class="btn-violet" id="login-button" type="button">Iniciar sesión</button>
+        <button class="btn-filled" id="signup-button" type="button">Crear cuenta</button>
+      </div>
+      <button class="btn-filled" id="logout-button" type="button" hidden>Cerrar sesión</button>
+      <button class="btn-compact" id="close-modal" type="button">Cerrar</button>
+    </div>
+    <div class="status" id="account-status" aria-live="polite"></div>
+  </div>
+</div>
+<div class="toast hidden" id="toast" role="status"></div>
+
+<!-- Supabase SDK. Necesitas internet para iniciar sesión y sincronizar récords. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/*
+  CONFIGURACIÓN OPCIONAL DE SUPABASE:
+  1. Crea un proyecto en https://supabase.com
+  2. Copia Project URL y anon/public key desde Project Settings > API.
+  3. Pégalos abajo. Nunca pongas aquí una service_role key.
+*/
+const SUPABASE_URL = "https://shznowjuvyfjgphqmwye.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_MhufuV1wFaydtlC5V0eP2g_sAvQwLgo";
+
+const categories = [
+  {id:"ciencia",name:"Ciencia",num:"01",desc:"Espacio, naturaleza y cuerpo humano"},
+  {id:"videojuegos",name:"Videojuegos",num:"02",desc:"Consolas, personajes y gaming"},
+  {id:"anime",name:"Anime",num:"03",desc:"Series, mundos y personajes"},
+  {id:"historia",name:"Historia",num:"04",desc:"Civilizaciones y acontecimientos"},
+  {id:"matematicas",name:"Matemáticas",num:"05",desc:"Lógica, números y retos"},
+  {id:"cultura",name:"Cultura general",num:"06",desc:"Un poco de todo"}
+];
+
+const bank = {
+  ciencia:[
+    {q:"¿Cuál es el planeta más grande del sistema solar?",a:["La Tierra","Júpiter","Marte","Venus"],c:1},
+    {q:"¿Qué órgano bombea la sangre?",a:["Pulmón","Hígado","Corazón","Riñón"],c:2},
+    {q:"¿Qué gas absorben las plantas durante la fotosíntesis?",a:["Dióxido de carbono","Helio","Hidrógeno","Neón"],c:0},
+    {q:"¿Cuántos huesos tiene aproximadamente un adulto?",a:["106","206","306","406"],c:1},
+    {q:"¿Cuál es la estrella más cercana a la Tierra?",a:["Sirio","Próxima Centauri","El Sol","Vega"],c:2},
+    {q:"¿A qué temperatura hierve el agua al nivel del mar?",a:["50 °C","80 °C","90 °C","100 °C"],c:3},
+    {q:"¿Qué parte de la célula contiene gran parte del ADN?",a:["Membrana","Núcleo","Citoplasma","Pared"],c:1},
+    {q:"¿Qué fuerza nos mantiene sobre el suelo?",a:["Magnetismo","Fricción","Gravedad","Electricidad"],c:2}
+  ],
+  videojuegos:[
+    {q:"¿Qué personaje es la mascota más conocida de Nintendo?",a:["Sonic","Mario","Crash","Master Chief"],c:1},
+    {q:"¿En qué juego construyes con bloques y exploras mundos?",a:["Minecraft","FIFA","Tetris","Overwatch"],c:0},
+    {q:"¿Qué compañía creó PlayStation?",a:["Microsoft","Sega","Sony","Nintendo"],c:2},
+    {q:"¿Cómo se llama el héroe principal de The Legend of Zelda?",a:["Zelda","Ganondorf","Kirby","Link"],c:3},
+    {q:"¿Qué género es principalmente Rocket League?",a:["Carreras de karts","Fútbol con coches","Peleas","Aventura gráfica"],c:1},
+    {q:"¿Qué juego popular incluye la isla y el autobús de batalla?",a:["Fortnite","Stardew Valley","Portal","The Sims"],c:0},
+    {q:"¿Qué criatura amarilla es famosa en Pokémon?",a:["Eevee","Pikachu","Mewtwo","Psyduck"],c:1},
+    {q:"¿Qué significa normalmente NPC en videojuegos?",a:["Nuevo personaje central","Nivel principal de combate","Personaje no jugador","Núcleo de potencia central"],c:2}
+  ],
+  anime:[
+    {q:"¿Cómo se llama el protagonista de Naruto?",a:["Sasuke Uchiha","Naruto Uzumaki","Kakashi Hatake","Shikamaru Nara"],c:1},
+    {q:"En Dragon Ball, ¿qué raza es Goku?",a:["Saiyajin","Namekiano","Androide","Kaioshin"],c:0},
+    {q:"¿Qué quiere encontrar Luffy en One Piece?",a:["Las Esferas del Dragón","El cuaderno de la muerte","El One Piece","Las siete llaves"],c:2},
+    {q:"¿Cómo se llama la libreta de Death Note?",a:["Soul Book","Death Note","Black File","Shinigami Pad"],c:1},
+    {q:"¿Quién es el protagonista de My Hero Academia?",a:["Bakugo","Todoroki","All Might","Izuku Midoriya"],c:3},
+    {q:"¿Qué cazan Tanjiro y sus compañeros en Demon Slayer?",a:["Titanes","Demonios","Piratas","Hollows"],c:1},
+    {q:"¿Qué estudio animó la película Mi vecino Totoro?",a:["Studio Ghibli","Toei Animation","MAPPA","Wit Studio"],c:0},
+    {q:"¿Qué tipo de poder usa principalmente Gojo en Jujutsu Kaisen?",a:["Alquimia","Respiraciones","Técnicas malditas","Magia de cartas"],c:2}
+  ],
+  historia:[
+    {q:"¿En qué año comenzó la Independencia de México?",a:["1810","1821","1910","1917"],c:0},
+    {q:"¿Qué civilización construyó Chichén Itzá?",a:["Romana","Maya","Egipcia","Inca"],c:1},
+    {q:"¿En qué continente surgió el antiguo Egipto?",a:["Asia","Europa","África","Oceanía"],c:2},
+    {q:"¿Quién fue el primer ser humano en pisar la Luna?",a:["Yuri Gagarin","Buzz Aldrin","John Glenn","Neil Armstrong"],c:3},
+    {q:"¿Qué muro cayó en 1989 y simbolizó un cambio en Europa?",a:["Muro de Adriano","Gran Muralla","Muro de Berlín","Muro de las Lamentaciones"],c:2},
+    {q:"¿Cuál fue la capital del Imperio azteca?",a:["Tenochtitlan","Palenque","Chichén Itzá","Tikal"],c:0},
+    {q:"¿Qué antigua civilización desarrolló la democracia en Atenas?",a:["Persa","Griega","Maya","Fenicia"],c:1},
+    {q:"¿En qué año terminó la Segunda Guerra Mundial?",a:["1939","1942","1945","1950"],c:2}
+  ],
+  matematicas:[
+    {q:"¿Cuánto es 8 × 7?",a:["54","48","56","64"],c:2},
+    {q:"¿Cuál es la raíz cuadrada de 81?",a:["7","8","9","10"],c:2},
+    {q:"¿Cuánto suman los ángulos interiores de un triángulo?",a:["90°","180°","270°","360°"],c:1},
+    {q:"¿Cuál es el 25 % de 200?",a:["25","40","50","75"],c:2},
+    {q:"Si x + 5 = 12, ¿cuánto vale x?",a:["5","6","7","8"],c:2},
+    {q:"¿Cuál de estos números es primo?",a:["9","15","21","13"],c:3},
+    {q:"¿Cuánto es 144 ÷ 12?",a:["10","11","12","14"],c:2},
+    {q:"¿Cuántos lados tiene un hexágono?",a:["5","6","7","8"],c:1}
+  ],
+  cultura:[
+    {q:"¿Cuál es la capital de México?",a:["Guadalajara","Monterrey","Ciudad de México","Mérida"],c:2},
+    {q:"¿Cuántos minutos tiene una hora?",a:["30","45","60","90"],c:2},
+    {q:"¿Cuál es el océano más grande?",a:["Atlántico","Índico","Ártico","Pacífico"],c:3},
+    {q:"¿Cuál es el idioma oficial más hablado en Brasil?",a:["Español","Portugués","Francés","Inglés"],c:1},
+    {q:"¿Cuántos colores tiene tradicionalmente el arcoíris?",a:["5","6","7","8"],c:2},
+    {q:"¿Qué instrumento tiene teclas blancas y negras?",a:["Piano","Violín","Flauta","Trompeta"],c:0},
+    {q:"¿Cuál es el satélite natural de la Tierra?",a:["El Sol","La Luna","Fobos","Europa"],c:1},
+    {q:"¿Cuántos días tiene un año común?",a:["360","364","365","366"],c:2}
+  ]
+};
+
+const $ = id => document.getElementById(id);
+let selectedCategory = "ciencia", currentQuestions = [], index = 0, score = 0;
+let lives = 3, streak = 0, maxStreak = 0, locked = false, timerId = null;
+let secondsLeft = 15, questionSeconds = 15, soundOn = true, audioCtx = null;
+let supabaseClient = null, currentUser = null;
+const localKey = "quizmania_v2_records";
+const localProfileKey = "quizmania_v2_profile";
+const hearts = n => "♥".repeat(n) + "♡".repeat(3 - n);
+
+function notify(message){
+  $("toast").textContent = message;
+  $("toast").classList.remove("hidden");
+  clearTimeout(notify.timeout);
+  notify.timeout = setTimeout(()=>$("toast").classList.add("hidden"),3000);
+}
+function playTone(freq=600,duration=.09,type="sine"){
+  if(!soundOn)return;
+  try{
+    audioCtx ||= new (window.AudioContext || window.webkitAudioContext)();
+    if(audioCtx.state==="suspended") audioCtx.resume();
+    const oscillator=audioCtx.createOscillator(), gain=audioCtx.createGain();
+    oscillator.type=type; oscillator.frequency.value=freq;
+    gain.gain.setValueAtTime(.08,audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);
+    oscillator.connect(gain);gain.connect(audioCtx.destination);
+    oscillator.start();oscillator.stop(audioCtx.currentTime+duration);
+  }catch(e){}
+}
+function getRecords(){try{return JSON.parse(localStorage.getItem(localKey)||"[]")}catch(e){return []}}
+function saveRecord(record){
+  const records=getRecords();records.push(record);
+  records.sort((a,b)=>b.score-a.score);
+  localStorage.setItem(localKey,JSON.stringify(records.slice(0,30)));
+  renderRecords();
+}
+function renderRecords(){
+  const records=getRecords();
+  $("best-stat").textContent=records.length?Math.max(...records.map(r=>r.score)):"0";
+  const el=$("local-records");el.innerHTML="";
+  if(!records.length){el.innerHTML='<p class="empty">Todavía no tienes récords. ¡Juega tu primera partida!</p>';return}
+  records.slice(0,5).forEach((r,i)=>{
+    const row=document.createElement("div");row.className="record";
+    const left=document.createElement("div");
+    const title=document.createElement("b");title.textContent=`${String(i+1).padStart(2,"0")} · ${r.category}`;
+    const small=document.createElement("small");small.textContent=`${r.player} · ${new Date(r.date).toLocaleDateString()}`;
+    left.append(title,small);
+    const pts=document.createElement("strong");pts.textContent=`${r.score} PTS`;
+    row.append(left,pts);el.append(row);
+  });
+}
+function renderCategories(){
+  $("categories").innerHTML="";
+  categories.forEach(cat=>{
+    const btn=document.createElement("button");btn.type="button";
+    btn.className="category"+(selectedCategory===cat.id?" selected":"");
+    btn.setAttribute("aria-pressed",String(selectedCategory===cat.id));
+    const num=document.createElement("span");num.className="num";num.textContent=cat.num;num.setAttribute("aria-hidden","true");
+    const arrow=document.createElement("span");arrow.className="arrow";arrow.textContent="↗";arrow.setAttribute("aria-hidden","true");
+    const name=document.createElement("strong");name.textContent=cat.name;
+    const desc=document.createElement("small");desc.textContent=cat.desc;
+    btn.append(num,arrow,name,desc);
+    btn.addEventListener("click",()=>{selectedCategory=cat.id;renderCategories();playTone(500,.06)});
+    $("categories").append(btn);
+  });
+}
+function timeForDifficulty(){return {easy:20,normal:15,hard:10}[$("difficulty").value]||15}
+function shuffle(arr){const copy=[...arr];for(let i=copy.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]]}return copy}
+function startGame(){
+  clearInterval(timerId);questionSeconds=timeForDifficulty();secondsLeft=questionSeconds;
+  currentQuestions=shuffle(bank[selectedCategory]).slice(0,Math.min(8,bank[selectedCategory].length));
+  index=0;score=0;lives=3;streak=0;maxStreak=0;locked=false;
+  $("home").classList.add("hidden");$("results").classList.add("hidden");$("game").classList.remove("hidden");
+  const cat=categories.find(c=>c.id===selectedCategory);
+  $("game-category").textContent=(cat?.num||"00")+" / "+(cat?.name||"Quiz");
+  window.scrollTo({top:0});
+  renderQuestion();playTone(500,.08);
+}
+function renderQuestion(){
+  clearInterval(timerId);locked=false;secondsLeft=questionSeconds;
+  const q=currentQuestions[index];
+  $("question-count").textContent=`Pregunta ${index+1} de ${currentQuestions.length}`;
+  $("points").textContent=`${score} puntos`;
+  $("streak").textContent=streak;
+  $("lives").textContent=hearts(lives);
+  $("game-progress").style.width=`${index/currentQuestions.length*100}%`;
+  $("question").textContent=q.q;$("feedback").textContent="";$("feedback").className="feedback";
+  $("next-button").classList.add("hidden");$("answers").innerHTML="";
+  q.a.forEach((text,i)=>{
+    const b=document.createElement("button");b.type="button";b.className="answer";
+    const letter=document.createElement("span");letter.className="letter";letter.textContent=String.fromCharCode(65+i);
+    const label=document.createElement("span");label.textContent=text;
+    b.append(letter,label);b.addEventListener("click",()=>answer(i));$("answers").append(b);
+  });
+  updateTimer();timerId=setInterval(()=>{
+    secondsLeft--;updateTimer();
+    if(secondsLeft<=0){clearInterval(timerId);if(!locked)answer(-1)}
+  },1000);
+}
+function updateTimer(){
+  $("timer").textContent=`${String(Math.max(secondsLeft,0)).padStart(2,"0")} s`;
+  $("timer").classList.toggle("low",secondsLeft<=5&&secondsLeft>0);
+  if(secondsLeft<=5&&secondsLeft>0)playTone(440,.025,"triangle");
+}
+function answer(choice){
+  if(locked)return;locked=true;clearInterval(timerId);
+  $("timer").classList.remove("low");
+  const q=currentQuestions[index],buttons=[...$("answers").querySelectorAll("button")];
+  buttons.forEach((b,i)=>{b.disabled=true;if(i===q.c)b.classList.add("correct");if(i===choice&&choice!==q.c)b.classList.add("wrong")});
+  if(choice===q.c){
+    streak++;maxStreak=Math.max(maxStreak,streak);
+    const base=10,bonus=Math.min(streak-1,5)*2,timeBonus=Math.ceil(secondsLeft/5);
+    const gained=base+bonus+timeBonus;score+=gained;
+    $("feedback").textContent=`✓ ¡Correcto! +${gained} puntos${streak>=3?` · Racha x${streak}`:""}`;
+    $("feedback").className="feedback ok";playTone(760,.12);setTimeout(()=>playTone(980,.1),80);
+  }else{
+    lives--;streak=0;
+    $("feedback").textContent=choice===-1?`✕ ¡Se acabó el tiempo! Era: ${q.a[q.c]}`:`✕ Respuesta incorrecta. Era: ${q.a[q.c]}`;
+    $("feedback").className="feedback bad";$("game").classList.remove("shake");void $("game").offsetWidth;$("game").classList.add("shake");playTone(180,.2,"sawtooth");
+  }
+  $("streak").textContent=streak;$("points").textContent=`${score} puntos`;
+  $("lives").textContent=hearts(lives);
+  $("game-progress").style.width=`${(index+1)/currentQuestions.length*100}%`;
+  $("next-button").textContent=(lives<=0||index===currentQuestions.length-1)?"Ver resultados →":"Siguiente pregunta →";
+  $("next-button").classList.remove("hidden");
+}
+function nextQuestion(){
+  if(!locked)return;
+  if(lives<=0||index>=currentQuestions.length-1){finishGame();return}
+  index++;renderQuestion();
+}
+async function finishGame(){
+  clearInterval(timerId);$("game").classList.add("hidden");$("results").classList.remove("hidden");
+  $("result-score").textContent=score;
+  $("result-emoji").textContent=score>=100?"Abordaje confirmado":score>=50?"En pleno vuelo":"Listo para despegar";
+  $("result-title").textContent=lives<=0?"¡Se acabaron las vidas!":"¡Partida terminada!";
+  $("result-summary").textContent=`Categoría: ${categories.find(c=>c.id===selectedCategory).name}. Racha máxima: ${maxStreak}. Vidas restantes: ${lives}.`;
+  const profile=JSON.parse(localStorage.getItem(localProfileKey)||'{"name":"Invitado"}');
+  const record={player:currentUser?.email?.split("@")[0]||profile.name||"Invitado",category:categories.find(c=>c.id===selectedCategory).name,score,date:new Date().toISOString(),streak:maxStreak};
+  saveRecord(record);$("save-status").textContent="Récord guardado en este dispositivo.";
+  if(supabaseClient&&currentUser){
+    try{
+      const {error}=await supabaseClient.from("scores").insert({user_id:currentUser.id,player_name:record.player,category:selectedCategory,score:score,max_streak:maxStreak});
+      if(error)throw error;
+      $("save-status").textContent="Récord guardado en este dispositivo y en línea.";
+      loadOnlineRecords();
+    }catch(e){$("save-status").textContent="Récord local guardado. No se pudo sincronizar: "+e.message}
+  }else if(!supabaseClient){
+    $("save-status").textContent+=" Para sincronizar, configura Supabase siguiendo la guía.";
+  }else{
+    $("save-status").textContent+=" Inicia sesión para sincronizar el récord en línea.";
+  }
+}
+function showHome(){
+  clearInterval(timerId);$("game").classList.add("hidden");$("results").classList.add("hidden");$("home").classList.remove("hidden");renderRecords();window.scrollTo({top:0});
+}
+$("start-button").addEventListener("click",startGame);
+$("next-button").addEventListener("click",nextQuestion);
+$("again-button").addEventListener("click",startGame);
+$("home-button").addEventListener("click",showHome);
+$("sound-toggle").addEventListener("click",()=>{
+  soundOn=!soundOn;$("sound-toggle").textContent=soundOn?"● Sonido":"○ Silencio";$("sound-toggle").setAttribute("aria-pressed",String(soundOn));if(soundOn)playTone();
+});
+
+function openModal(){$("account-modal").classList.remove("hidden");$("account-status").textContent="";$("logout-button").hidden=!currentUser}
+function closeModal(){$("account-modal").classList.add("hidden")}
+$("account-button").addEventListener("click",openModal);
+$("close-modal").addEventListener("click",closeModal);
+$("account-modal").addEventListener("click",e=>{if(e.target===$("account-modal"))closeModal()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
+function setAccountStatus(msg){$("account-status").textContent=msg}
+function refreshAccount(){
+  $("account-button").textContent=currentUser?currentUser.email.split("@")[0]:"Iniciar sesión";
+  $("logout-button").hidden=!currentUser;
+}
+async function signIn(){
+  if(!supabaseClient){setAccountStatus("Modo local: puedes jugar sin cuenta. Para cuentas reales y sincronización, configura SUPABASE_URL y SUPABASE_ANON_KEY en el código.");return}
+  const email=$("email").value.trim(),password=$("password").value;
+  if(!email||!password){setAccountStatus("Escribe tu correo y contraseña.");return}
+  setAccountStatus("Conectando…");
+  const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+  if(error){setAccountStatus(error.message);return}
+  currentUser=data.user;refreshAccount();setAccountStatus("Sesión iniciada. Tus próximos récords podrán sincronizarse.");loadOnlineRecords();
+}
+async function signUp(){
+  if(!supabaseClient){setAccountStatus("Primero configura Supabase para crear cuentas reales. Puedes jugar localmente mientras tanto.");return}
+  const email=$("email").value.trim(),password=$("password").value;
+  if(!email||password.length<6){setAccountStatus("Introduce un correo válido y una contraseña de al menos 6 caracteres.");return}
+  setAccountStatus("Creando cuenta…");
+  const {data,error}=await supabaseClient.auth.signUp({email,password});
+  if(error){setAccountStatus(error.message);return}
+  if(data.session){currentUser=data.user;refreshAccount();setAccountStatus("Cuenta creada y sesión iniciada.");}
+  else{setAccountStatus("Cuenta creada. Revisa tu correo para confirmar el registro y después inicia sesión.");}
+}
+$("login-button").addEventListener("click",signIn);
+$("signup-button").addEventListener("click",signUp);
+$("logout-button").addEventListener("click",async()=>{
+  if(supabaseClient)await supabaseClient.auth.signOut();
+  currentUser=null;refreshAccount();setAccountStatus("Sesión cerrada.");
+});
+async function loadOnlineRecords(){
+  if(!supabaseClient){$("online-records").innerHTML='<p class="empty">Configura Supabase para activar la tabla mundial.</p>';return}
+  const {data,error}=await supabaseClient.from("scores").select("player_name,category,score,created_at").order("score",{ascending:false}).limit(10);
+  if(error){$("online-records").innerHTML='<p class="empty">No se pudo cargar la tabla. Revisa la configuración de Supabase y las políticas SQL.</p>';return}
+  $("online-records").innerHTML="";
+  if(!data.length){$("online-records").innerHTML='<p class="empty">Aún no hay puntuaciones en línea.</p>';return}
+  data.forEach((r,i)=>{
+    const row=document.createElement("div");row.className="record";
+    const left=document.createElement("div"),name=document.createElement("b"),small=document.createElement("small"),pts=document.createElement("strong");
+    name.textContent=`${String(i+1).padStart(2,"0")} · ${r.player_name||"Jugador"}`;
+    small.textContent=`${categories.find(c=>c.id===r.category)?.name||r.category} · ${new Date(r.created_at).toLocaleDateString()}`;
+    pts.textContent=`${r.score} PTS`;left.append(name,small);row.append(left,pts);$("online-records").append(row);
+  });
+}
+function initCloud(){
+  const configured=SUPABASE_URL.startsWith("https://")&&SUPABASE_ANON_KEY.length>20&&!SUPABASE_URL.includes("PEGA_AQUI")&&!SUPABASE_ANON_KEY.includes("PEGA_AQUI");
+  if(configured&&window.supabase){
+    supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+    $("cloud-status").textContent="● Conexión en línea";
+    supabaseClient.auth.getSession().then(({data})=>{currentUser=data.session?.user||null;refreshAccount();});
+    supabaseClient.auth.onAuthStateChange((_event,session)=>{currentUser=session?.user||null;refreshAccount();});
+    loadOnlineRecords();
+  }else{
+    $("cloud-status").textContent="● Modo local";
+    $("account-intro").textContent="Ahora puedes jugar sin cuenta. Para cuentas reales y sincronización entre dispositivos, sigue la guía de configuración de Supabase.";
+    loadOnlineRecords();
+  }
+}
+/* Sello del pie: reloj en vivo (la firma "coordenadas" de la guía, sin pedir ubicación) */
+function tickClock(){
+  const d=new Date(),off=-d.getTimezoneOffset()/60;
+  $("clock").textContent=d.toLocaleTimeString("es-MX",{hour12:false})+" · UTC"+(off>=0?"+":"")+off;
+}
+tickClock();setInterval(tickClock,1000);
+renderCategories();renderRecords();refreshAccount();initCloud();
+</script>
+</body>
+</html>
